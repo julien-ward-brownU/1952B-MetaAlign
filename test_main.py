@@ -11,8 +11,11 @@ def main():
     # scrub original image
     # add parsed preferences to caption
     
-    img_dr = os.getcwd() + r"\data\input_images\DSCN0010 test.jpg"
-    exif_tool_dr= os.getcwd() + r"\ExifTool\exiftool.exe"
+    # img_dr = os.getcwd() + r"\data\input_images\DSCN0010test.jpg"
+    # exif_tool_dr= os.getcwd() + r"\exiftool.exe"
+    img_dr = os.path.join(os.getcwd(), "data", "input_images", "DSCN0010 copy.jpg")
+    exif_tool_dr = os.path.join(os.getcwd(), "exiftool.exe")
+
     data_dr = os.getcwd() + r"\data"
     # directory to remove txt file
     meta_txt_dr = os.getcwd() + r"\data\input_images\temp.txt"
@@ -23,12 +26,14 @@ def main():
 
     # TODO: these calls should probably be moved into preferences based on what preferences they selected.
     #edit.print_metadata()
+    #edit.temp_metadata_csv()
+    #edit.metadata_caption()
+    #edit.delete_all_meta_data()
+    edit.delete_geo_tag()
     edit.temp_metadata_txt()
-    edit.temp_metadata_csv()
-    edit.metadata_caption()
 
     # Should delete all data except user preferences, should always be at the end
-    edit.remove_metadata(meta_txt_dr)
+    #edit.remove_metadata(meta_txt_dr)
     #edit.remove_metadata(meta_csv_dr)
 
 if __name__ == "__main__":

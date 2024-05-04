@@ -58,7 +58,7 @@ class ExifTool:
         # Convert to DataFrame and save as CSV
         # df = pd.DataFrame(data.items(), columns=['Attribute', 'Value'])
         # df.to_csv(self.data + r'\temp.csv', index=None)
-        data = self.temp_metadata_dic(self.data)
+        data = self.temp_metadata_dic()
         df = pd.DataFrame([data])
         
         df.to_csv(self.data + r'\meta_data\temp.csv')
@@ -88,7 +88,34 @@ class ExifTool:
             print("Meta data sucessfully added to caption.")
         else:
             print("Error adding meta data to caption")
+
+    # TODO: Takes preference and produces into caption (next should be to delete all of the in metadata)
+    def delete_all_meta_data(self):
+
+        # TODO: command works, and caption in txt is edited but shoudn't we be able to see caption change in file?
+        # also makes a new file...
+        command = [self.exif, "-all=", self.img]
+        
+        result = subprocess.run(command)
+        if result.returncode == 0:
+            print("Meta data sucessfully added to caption.")
+        else:
+            print("Error adding meta data to caption: ", result)
     
+        # TODO: Takes preference and produces into caption (next should be to delete all of the in metadata)
+    def delete_geo_tag(self):
+
+        # TODO: command works, and caption in txt is edited but shoudn't we be able to see caption change in file?
+        # also makes a new file...
+        #command = [self.exif, 'all= ', self.img]
+        command = [self.exif, "-gps:all=", self.img]
+
+        result = subprocess.run(command)
+        if result.returncode == 0:
+            print("GEO Meta data sucessfully removed.")
+        else:
+            print("Error removing geo metadata: ", result)
     
+
 
 
