@@ -35,3 +35,22 @@ class Granularity(Enum):
     DECADE = 4
 
 
+# TODO: Pseudocode - Image Upload Detection 
+def image_detection(image):
+    """
+    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
+    input = detected_image
+    return input
+    """
+    input = image
+    return input
+
+# TODO: Pseudocode - Image Deletion after use 
+def image_deletion(input):
+    """
+    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
+    print("Deleting Image data file: ", input)
+    os.remove(input)
+    """
+    pass
+    
