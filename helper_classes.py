@@ -21,18 +21,17 @@ class DataType(Enum):
 # ANNOTATION: Types of edits allowed 
 class EditType(Enum):
     KEEP = 0
-    RANDOM_LEADING = 1
-    RANDOM_CENTER = 2
+    RANDOM_WINDOW = 1
+    RANDOM_PERIOD = 2
     DEFAULT = 3
     CAPTION = 4
-    SCRUB = 5
+    DELETE = 5
 
 class Granularity(Enum):
-    HOUR = 0
-    DAY = 1
-    MONTH = 2
-    YEAR = 3
-    DECADE = 4
+    NOT_APPLICABLE = 0
+    LOW = 1
+    MEDIUM = 2
+    HIGH = 3
 
 
 # TODO: Pseudocode - Image Upload Detection 
@@ -46,11 +45,11 @@ def image_detection(image):
     return input
 
 # TODO: Pseudocode - Image Deletion after use 
-def image_deletion(input):
+def image_deletion(image):
     """
     Detects when image is uploaded onto website and stores image temp into placeholder value (input).
     print("Deleting Image data file: ", input)
-    os.remove(input)
+    os.remove(image)
     """
     pass
     
