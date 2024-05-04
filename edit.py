@@ -1,6 +1,8 @@
 # subprocess API: https://docs.python.org/3/library/subprocess.html#subprocess.run
 import subprocess
 import os
+import pandas as pd
+from helper_classes import timeTags
 '''
 Method takes in two file locations and returns the metadata into the command line
 :param exif_tool_dr: is the exiftool.exe file
@@ -26,37 +28,83 @@ class ExifTool:
     def temp_metadata_txt(self):
         
         command = [self.exif, '-w', '%dtemp.txt', self.img]
+        print("Creating meta_data text file:")
+        result = subprocess.run(command)
 
-        print(subprocess.run(command))
+        if result.returncode == 0:
+            print("Meta_data text file created successfully.")
+        else:
+            print("Error creating meta_data text file:", result.stderr)
 
-    # takes temp.txt file and turns it into a dictionary
-    def get_metadata(self, txtfile):
-        metadata = {}
-        with open(txtfile, 'r') as file:
-            lines = file.readlines()
-            for line in lines:
-                entry = line.split(":")
-                metadata[entry[0]] = entry[1]
-        return metadata
 
-    #TODO: broken meant to turn metadata to csv vile
-    def temp_metadata_csv(self):
+    # CAREFUL WHAT FILE YOU PUT HERE IN PATH!!!!!!!!!!!!!!!
+    def remove_metadata(self, file_path):
+        print("Deleting meta_data file.")
+        os.remove(file_path)
+
+    # takes txt file, puts into dictionary and produces dataframe to transform into csv using pandas.
+    def temp_metadata_dic(self):
     
-        command = [self.exif, '-csv', '.DSCN0010.jpg', '>', '.temp.csv']
+        with open(self.data + r"\input_images\temp.txt", 'r') as file:
+            lines = file.readlines()
+        # Parse key-value pairs
+        data = {}
+        for line in lines:
+            if ':' in line:
+                key, value = map(str.strip, line.split(':', 1))
+                data[key] = value
+        return data
+    
+    # creates a csv file of the txt file data
+    def temp_metadata_csv(self):
+        # Convert to DataFrame and save as CSV
+        # df = pd.DataFrame(data.items(), columns=['Attribute', 'Value'])
+        # df.to_csv(self.data + r'\temp.csv', index=None)
+        data = self.temp_metadata_dic(self.data)
+        df = pd.DataFrame([data])
+        
+        df.to_csv(self.data + r'\meta_data\temp.csv')
+        print("Metadata successfully converted from TXT to CSV.")
 
-        os.system(self.exif + ' -csv ' + self.img + ' > temp.csv')
-        #print(subprocess.run(command, capture_output=True))
+
+    # Takes preference and produces into caption (next should be to delete all of the in metadata)
+    def metadata_caption(self):
+        output = self.data + r'\output_images\output.jpg'
+        data = self.temp_metadata_dic()
+        meta_string = ''
+        # you can change this to whatever is in the helper function
+        for item in timeTags:
+            meta_string += item + ": " + data[item] + "\n"
+        
+        # TODO: command works, and caption in txt is edited but shoudn't we be able to see caption change in file?
+        # also makes a new file...
+        command = [self.exif, '-caption='+ meta_string, self.img]
+        # This following line is meant to delete all metadata and include a comment (only test on TEST Image), 
+        # the problem here is that it seems to obscure some data and doesn't effect date and time data?
+        #command = [self.exif, '-all= ', '-comment='+ meta_string, self.img]
+        
+        result = subprocess.run(command)
+        print(result)
+        if result.returncode == 0:
+            print("Meta data sucessfully added to caption.")
+        else:
+            print("Error adding meta data to caption")
 
 def main():
-    img_dr = r"C:\Users\jules\Documents\Brown Work\Spring 2024\CS 1952B\Final Project\MetaAlign\1952B-MetaAlign\ExifTool\Images\DSCN0010.jpg"
-    exif_tool_dr= r"C:\Users\jules\Documents\Brown Work\Spring 2024\CS 1952B\Final Project\MetaAlign\1952B-MetaAlign\ExifTool\exiftool.exe"
-    temp_dr = r"C:\Users\jules\Documents\Brown Work\Spring 2024\CS 1952B\Final Project\MetaAlign\1952B-MetaAlign\ExifTool\Images"
-    
-    edit = ExifTool(img_dr, exif_tool_dr, temp_dr)
+    img_dr = os.getcwd() + r"\data\input_images\DSCN0010 test.jpg"
+    exif_tool_dr= os.getcwd() + r"\ExifTool\exiftool.exe"
+    data_dr = os.getcwd() + r"\data"
+    # directory to remove txt file
+    meta_txt_dr = os.getcwd() + r"\data\input_images\temp.txt"
+    # directory to remove csv file
+    meta_csv_dr = os.getcwd() + r"\data\meta_data\temp.csv"
+
+    edit = ExifTool(img_dr, exif_tool_dr, data_dr)
     #edit.print_metadata()
     edit.temp_metadata_txt()
-    #edit.temp_metadata_csv()
-    print(edit.get_metadata(r'C:\Users\jules\Documents\Brown Work\Spring 2024\CS 1952B\Final Project\MetaAlign\1952B-MetaAlign\ExifTool\Images\temp.txt'))
+    edit.temp_metadata_csv()
+    edit.metadata_caption()
+    edit.remove_metadata(meta_txt_dr)
 
 if __name__ == "__main__":
     main()
