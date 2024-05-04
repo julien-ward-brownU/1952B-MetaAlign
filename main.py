@@ -13,7 +13,7 @@ def main():
     # add parsed preferences to caption
     
     img_dr = os.getcwd() + r"\data\input_images\DSCN0010 test.jpg"
-    exif_tool_dr= os.getcwd() + r"\ExifTool\exiftool.exe"
+    exif_tool_dr= os.getcwd() + r"/ExifTool/exiftool.exe"
     data_dr = os.getcwd() + r"\data"
     # directory to remove txt file
     meta_txt_dr = os.getcwd() + r"\data\input_images\temp.txt"

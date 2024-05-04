@@ -1,32 +1,43 @@
+from helper_classes import *
+
 class UserPreferences:
 
-    def __init__(self):
-        pass
+        # ANNOTATION: For each web
+    def __init__(self, name, data: list[DataType], granularity: list[Granularity], 
+                 edits: list[EditType], default: bool):
+        self.name = name
+        self.data = data
+        self.granularity = granularity
+        self.edits = edits
+        self.is_default = default
+        
     # set the users current preferences
+    # TODO move code from main into here
     def set_preferences(self):
         pass
     
-    # access the users current preferences.
+    # Displays the users current prefernces for this website.
     def get_preferences(self):
-        pass
+        print("Preferences for: " + self.name + "\n")
+        for data in self.data:
+            print("Data: " + data.name + "\nType of edit: " + self.edits[data.value].name + "\nGranularity: " + self.granularity[data.value].name + "\n \n")
+        print("Are these default preferences? " + self.is_default)
 
-    # probably add it to a csv that we store
-    def set_saved_preferences(self):
-        pass
+    # Makes this set of preferences default
+    def set_default(self):
+        self.is_default = True
 
-    # access csv with user preferences
-    def get_saved_preferences(self):
-        pass
+    # Code to move to other classes
     
-    # this will be decided by us
-    def get_preset_preferences(self):
-        pass
+    # Maybe have a pickle file that on start up gets loaded? 
+    preferences: list[UserPreferences] = list()
     
-    def get_data_type(self):
-        pass
-
-    def get_edit_type(self):
-        pass
+    def get_preferences():
+        for pref in preferences:
+            if pref.name == location:
+                return pref
+        # else: no prefernces founf
+        return set_new_preferences()
 
 
 
