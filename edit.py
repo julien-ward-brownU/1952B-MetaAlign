@@ -2,7 +2,7 @@
 import subprocess
 import os
 import pandas as pd
-from helper_classes import timeTags
+from helper_classes import timeTags, locationTags, deviceTags
 '''
 Method takes in two file locations and returns the metadata into the command line
 :param exif_tool_dr: is the exiftool.exe file
@@ -10,23 +10,27 @@ Method takes in two file locations and returns the metadata into the command lin
 '''
 
 class ExifTool:
-    def __init__(self, img, exif_tool, temp_dr):
+    def __init__(self, img, exif_tool, data_dr, output_dr):
         self.img = img
         self.exif = exif_tool
-        self.data = temp_dr
-
+        self.data = data_dr
+        self.output = output_dr
+        
     def print_metadata(self):
         # The command is list of the exiftool.exe and the image location
         command = [self.exif, self.img]
-
         # A subprocess is created and the command is called using echo 
         # https://www.geeksforgeeks.org/how-to-run-bash-script-in-python/
         subprocess.run(command)
 
-    #get metadata and exports it into txt file
+    # get metadata and exports it into txt file
     def temp_metadata_txt(self):
-        # exiftool -w output.txt image_name.jpg
-        command = [self.exif, '-w', '%dtemp.txt', self.img]
+        metadata_txt = os.path.join(self.data, "input_images", "temp.txt")
+        # Does a temp already exist? If so remove it!
+        if os.path.exists(metadata_txt):
+            self.remove_metadata(metadata_txt)
+
+        command = [self.exif, '-w', '%dtemp.txt',  self.img]
         result = subprocess.run(command)
 
         if result.returncode == 0:
@@ -37,7 +41,7 @@ class ExifTool:
 
     # CAREFUL WHAT FILE YOU PUT HERE IN PATH! will delete file!!!!!!!!!!!!!!!
     def remove_metadata(self, file_path):
-        print("Deleting Meta data file: ", file_path)
+        print("Deleting file!")
         os.remove(file_path)
 
     # Takes text file, and stores information in a dictionary to be used for preferences.
@@ -55,62 +59,79 @@ class ExifTool:
     
     # creates a csv file using pandas dataframe to convert a dictionary to a csv.
     def temp_metadata_csv(self):
+
         # Convert to DataFrame and save as CSV
-        # df = pd.DataFrame(data.items(), columns=['Attribute', 'Value'])
-        # df.to_csv(self.data + r'\temp.csv', index=None)
         data = self.temp_metadata_dic()
         df = pd.DataFrame([data])
-        
         df.to_csv(self.data + r'\meta_data\temp.csv')
         print("Metadata successfully converted from TXT to CSV.")
 
 
-    # TODO: Takes preference and produces into caption (next should be to delete all of the in metadata)
-    def metadata_caption(self):
-        output = self.data + r'\output_images\output.jpg' # TODO: output into different folder zzzzz why no work
-
+    #TODO should take in what you want to save into caption
+    def caption_string(self, data):
         data = self.temp_metadata_dic() # get dictionary metadata
         meta_string = ''
         # you can change this to whatever is in the helper function
-        for item in timeTags:
+        for item in data:
             meta_string += item + ": " + data[item] + "\n"
-        
-        # TODO: command works, and caption in txt is edited but shoudn't we be able to see caption change in file?
-        # also makes a new file...
-        command = [self.exif, '-caption='+ meta_string, self.img]
-        # This following line is meant to delete all metadata and include a comment (only test on TEST Image), 
-        # the problem here is that it seems to obscure some data and doesn't effect date and time data?
-        #command = [self.exif, '-all= ', '-comment='+ meta_string, self.img]
-        
-        result = subprocess.run(command)
-        print(result)
-        if result.returncode == 0:
-            print("Meta data sucessfully added to caption.")
-        else:
-            print("Error adding meta data to caption")
-
-    # TODO: Takes preference and produces into caption (next should be to delete all of the in metadata)
-    def delete_all_meta_data(self):
-
-        # TODO: command works, and caption in txt is edited but shoudn't we be able to see caption change in file?
-        # also makes a new file...
-        command = [self.exif, "-all=", self.img]
-        
-        result = subprocess.run(command)
-        if result.returncode == 0:
-            print("Meta data sucessfully added to caption.")
-        else:
-            print("Error adding meta data to caption: ", result)
+        return meta_string
     
-        # TODO: Takes preference and produces into caption (next should be to delete all of the in metadata)
+    # This just takes metadata preferences and add its to comment/caption
+    def metadata_caption(self):
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
+        # TODO: need to change the input to this to whatever the user preference is
+        meta_string = self.caption_string(deviceTags)
+
+        command = [self.exif, "-comment="+ meta_string, "-o",  self.output, self.img]
+        
+        result = subprocess.run(command)
+        if result.returncode == 0:
+            print("Meta data sucessfully added to caption.")
+        else:
+            print("Error adding meta data to caption:", result)
+
+    # Deletes all metadata and adds preference to caption/comment (idk which one to pick)
+    def delete_metadata_add_caption(self):
+        # This prevents an error of the file already existing
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
+        # TODO: need to change the input to this to whatever the user preference is
+        meta_string = self.caption_string(deviceTags)
+
+        command = [self.exif, "-all=","-comment="+ meta_string, "-o",  self.output,  self.img]
+        result = subprocess.run(command)
+
+        if result.returncode == 0:
+            print("Meta data sucessfully deleted and added to caption.")
+        else:
+            print("Error deleting and adding meta data to caption:", result)
+
+    # Deletes all metadata
+    def delete_all_metadata(self):
+
+        # This prevents an error of the file already existing
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
+
+        command = [self.exif, "-all=", "-o", self.output, self.img]
+        result = subprocess.run(command)
+
+        if result.returncode == 0:
+            print("All meta data sucessfully deleted.")
+        else:
+            print("Error deleting all meta data: ", result)
+    
+    # Delete geo tags within file
     def delete_geo_tag(self):
 
-        # TODO: command works, and caption in txt is edited but shoudn't we be able to see caption change in file?
-        # also makes a new file...
-        #command = [self.exif, 'all= ', self.img]
-        command = [self.exif, "-gps:all=", self.img]
+        # This prevents an error of the file already existing
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
 
+        command = [self.exif, "-gps:all=", "-o", self.output, self.img]
         result = subprocess.run(command)
+
         if result.returncode == 0:
             print("GEO Meta data sucessfully removed.")
         else:

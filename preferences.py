@@ -30,14 +30,14 @@ class UserPreferences:
     # Code to move to other classes
     
     # Maybe have a pickle file that on start up gets loaded? 
-    preferences: list[UserPreferences] = list()
+    # preferences: list[UserPreferences] = list()
     
-    def get_preferences():
-        for pref in preferences:
-            if pref.name == location:
-                return pref
-        # else: no prefernces founf
-        return set_new_preferences()
+    # def get_preferences():
+    #     for pref in preferences:
+    #         if pref.name == location:
+    #             return pref
+    #     # else: no prefernces founf
+    #     return set_new_preferences()
 
 
 
