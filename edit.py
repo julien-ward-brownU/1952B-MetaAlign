@@ -2,11 +2,6 @@
 import subprocess
 import os
 import pandas as pd
-'''
-Method takes in two file locations and returns the metadata into the command line
-:param exif_tool_dr: is the exiftool.exe file
-:param img: simple flower jpg image 
-'''
 
 '''
 ExifTool class manipulates meta data of an image by accessing the orginal ExifTool through the command line (https://exiftool.org/).
@@ -29,7 +24,7 @@ class ExifTool:
     Prints all available metadata of input file into terminal.
     '''
     def print_metadata(self):
-        # Terminal Command: exiftool.exe input_image.jpg
+        # Command to call exiftool access the image and print out the metadata
         command = [self.exif, self.img]
         # A subprocess is created and the command is called using echo 
         # https://www.geeksforgeeks.org/how-to-run-bash-script-in-python/
@@ -45,15 +40,15 @@ class ExifTool:
         if os.path.exists(metadata_txt):
             self.remove_metadata(metadata_txt)
 
-        # Terminal Command: exiftool.exe -w "temp.txt" input_image.jpg
+        # Command to call exiftool to write the metadata to a .txt file
         command = [self.exif, '-w', '%dtemp.txt',  self.img]
         # Run the command in the terminal
         result = subprocess.run(command)
 
         if result.returncode == 0:
-            print("Meta_data text file was created successfully.")
+            print("Input image meta_data text file was created successfully.")
         else:
-            print("Error creating meta_data text file:", print(result))
+            print("Error creating input image meta_data text file:", print(result))
     
     '''
     Accesses output file metadata to export and temporarly store data in a text file within the output_images 
@@ -63,19 +58,25 @@ class ExifTool:
     def output_metadata_txt(self):
 
         metadata_txt = os.path.join(self.data, "output_images", "temp.txt")
+        output_jpg = os.path.join(self.data, "output_images", "output.jpg")
+        
+        
+        if not os.path.exists(output_jpg):
+            print("Can't call this function without creating an output file.")
+            return 0
+        
         if os.path.exists(metadata_txt):
             self.remove_metadata(metadata_txt)
 
+        # Command to call exiftool to write the metadata to a .txt file
         command = [self.exif, '-w', '%dtemp.txt',  self.output]
         result = subprocess.run(command)
 
         if result.returncode == 0:
-            print("Meta_data text file was created successfully.")
+            print("Output image meta_data text file was created successfully.")
         else:
-            print("Error creating meta_data text file:", print(result))
+            print("Error creating output image meta_data text file:", print(result))
 
-
-    
     '''
     Delete file in path. Used to remove temporary metadata that are in text and csv files to preserve user privacy.
 
@@ -88,14 +89,18 @@ class ExifTool:
     '''
     Accesses the temporary metadata text file and creates a dictionary of the data. Keys are data headers and values represent the data.
     Example: {"Modify Date" : "2024:05:10 12:00:00"}
+
+    :return (dictionary) data: A dictionary of all the metadata of the image.
     '''
-    # Takes text file, and stores information in a dictionary to be used for preferences.
     def temp_metadata_dic(self):
         
+        # Read in the metadata text file line by line
         with open(self.data + r"\input_images\temp.txt", 'r') as file:
             lines = file.readlines()
         # Parse key-value pairs
         data = {}
+        
+        # Loop through the lines, parse them and add them to a dictionary
         for line in lines:
             if ':' in line:
                 key, value = map(str.strip, line.split(':', 1))
@@ -118,6 +123,7 @@ class ExifTool:
     Turn specific data type in metadata into a string to be added to captions.
 
     :param (list) data_type: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
+    :return (str) meta_string: A string of a subset of metadata based on the data_type (user preference).
     '''
     def caption_string(self, data_type):
         data = self.temp_metadata_dic() # get dictionary metadata
@@ -132,7 +138,7 @@ class ExifTool:
         return meta_string
     
     '''
-    Turn specific data type in metadata into a string, by calling caption_string, then add this string of metadata to the caption.
+    Turn specific data type in metadata into a string, by calling caption_string, then add this string of metadata to the metadata field "Caption".
 
     :param (list) data_type: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
     '''
@@ -143,16 +149,17 @@ class ExifTool:
         # TODO: need to change the input to this to whatever the user preference is
         meta_string = self.caption_string(data_type)
 
+        # Command to call exiftool to write specific metadata to the metadata field "Caption" and output the new image in the outputs folder
         command = [self.exif, "-caption="+ meta_string, "-o",  self.output, self.img]
-        
         result = subprocess.run(command)
+
         if result.returncode == 0:
             print("Meta data sucessfully added to caption.")
         else:
             print("Error adding meta data to caption:", result)
 
     '''
-    Turn specific data type in metadata into a string, by calling caption_string, then add this string of metadata to the caption.
+    Turn specific data type in metadata into a string, by calling caption_string, then add this string of metadata to to the metadata field "Caption".
 
     :param (list) datatype: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
     '''
@@ -181,6 +188,7 @@ class ExifTool:
         if os.path.exists(self.output):
             self.remove_metadata(self.output)
 
+        # Command to call exiftool to delete all the metadata and output the new image in the outputs folder
         command = [self.exif, "-all=", "-o", self.output, self.img]
         result = subprocess.run(command)
 
@@ -190,17 +198,22 @@ class ExifTool:
             print("Error deleting all meta data: ", result)
 
     '''
-    Edit and change the granularity of GPS metadata.
+    Edit and change the values and granularity of GPS metadata.
 
-    :param (str) latitude: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
+    :param (str) latitude: Format: ("XX deg XX' X.XX\" C") X: Any real number, C: "N", "S"
+    :param (str) lat_ref: Format: "North", "South"
+    :param (str) longitude: Format: ("XX deg XX' X.XX\" C") X: Any real number, C: "N", "S"
+    :param (str) long_ref: Format: "East", "West"
+    :param (str) altitude: Format: ("XX m") X: Any real number
+    :param (str) alt_ref: Format: "Above Sea Level", "Below Sea Level"
     '''
-    # Input Format: "00 deg 00' 0.00\" N", "00 deg 00' 0.00\" E", "00 deg 00' 0.00\" N, 00 deg 00' 0.00\" E"
     def edit_gps(self, latitude, lat_ref, longitude, long_ref, altitude, alt_ref):
         
         # This prevents an error of the file already existing
         if os.path.exists(self.output):
             self.remove_metadata(self.output)
 
+        # Command to call exiftool to edit GPS metadata and output the new image in the outputs folder
         command = [self.exif,
             f"-GPSLatitude={latitude}", # Set latitude metadata to the new latitude 
             f"-GPSLatitudeRef={lat_ref}",
@@ -216,14 +229,17 @@ class ExifTool:
             print("Geo metadata edited successfully.")
         else:
             print("Error editing Geo metadata:", result)
-
-    # Delete geo tags within file
+    
+    '''
+    Delete all GEO metadata (that is possible to delete) in the image.
+    '''
     def delete_geo_tag(self):
 
         # This prevents an error of the file already existing
         if os.path.exists(self.output):
             self.remove_metadata(self.output)
 
+        # Command to call exiftool to delete all GPS metadata and output the new image in the outputs folder
         command = [self.exif, "-gps:all=", "-o", self.output, self.img]
         result = subprocess.run(command)
 
@@ -232,14 +248,19 @@ class ExifTool:
         else:
             print("Error removing geo metadata: ", result)
 
+    '''
+    Edit and change the values of the time metadata.
 
-    # new_time: "2024:05:10 12:00:00"
+    :param (str) new_time: Format: "YYYY:MM:DD HH:MM:SS"
+    Example: "2024:05:10 12:00:00"
+    '''
     def edit_time(self, new_time):
         
         # This prevents an error of the file already existing
         if os.path.exists(self.output):
             self.remove_metadata(self.output)
 
+        # Command to call exiftool to edit all time metadata and output the new image in the outputs folder
         command = [
             self.exif,
             f"-AllDates={new_time}",  # Set all date/time metadata to the new time
@@ -248,7 +269,6 @@ class ExifTool:
             "-o", self.output,  # Output file path
             self.img  # Input file path
         ]
- 
         result = subprocess.run(command)
         
         # Check if the command executed successfully
@@ -257,13 +277,17 @@ class ExifTool:
         else:
             print("Error editing time metadata:", result)
 
-        # new_time: "2024:05:10 12:00:00"
+        
+    '''
+    Delete all GEO metadata (that is possible to delete) in the image.
+    '''
     def delete_time(self):
         
         # This prevents an error of the file already existing
         if os.path.exists(self.output):
             self.remove_metadata(self.output)
 
+        # Command to call exiftool to delete all time metadata and output the new image in the outputs folder
         command = [
             self.exif,
             f"-AllDates=",  # Set all date/time metadata to the new time
@@ -272,22 +296,29 @@ class ExifTool:
             "-o", self.output,  # Output file path
             self.img  # Input file path
         ]
- 
         result = subprocess.run(command)
         
         # Check if the command executed successfully
         if result.returncode == 0:
-            print("Time metadata edited successfully.")
+            print("Time metadata deleted successfully.")
         else:
-            print("Error editing time metadata:", result)
+            print("Error deleting time metadata:", result)
 
-    # Input Format: "make", "model", "sn"
+    '''
+    Edit and change the values of the time metadata.
+
+    :param (str) make: Format: "Make"
+    :param (str) model: Format: "Model"
+    :param (str) serial_num: Format: "Serial Number"
+    Example: "NIKON", "COOLPIX P6000", "12311"
+    '''
     def edit_device_tags(self, make, model, serial_num):
         
         # This prevents an error of the file already existing
         if os.path.exists(self.output):
             self.remove_metadata(self.output)
-
+        
+        # Command to call exiftool to edit camera metadata and output the new image in the outputs folder
         command = [
             self.exif,
             f"-Make={make}",  # Set make of the camera
@@ -296,7 +327,6 @@ class ExifTool:
             "-o", self.output,  # Output file path
             self.img  # Input file path
         ]
- 
         result = subprocess.run(command)
         
         # Check if the command executed successfully
@@ -305,12 +335,16 @@ class ExifTool:
         else:
             print("Error editing camera metadata:", result)
     
+    '''
+    Delete all Camera metadata (that is possible to delete) in the image.
+    '''
     def delete_device_tags(self):
         
         # This prevents an error of the file already existing
         if os.path.exists(self.output):
             self.remove_metadata(self.output)
 
+        # Command to call exiftool to delete camera metadata and output the new image in the outputs folder
         command = [
             self.exif,
             f"-Make=",  # Delete make of the camera
@@ -319,7 +353,6 @@ class ExifTool:
             "-o", self.output,  # Output file path
             self.img  # Input file path
         ]
- 
         result = subprocess.run(command)
         
         # Check if the command executed successfully

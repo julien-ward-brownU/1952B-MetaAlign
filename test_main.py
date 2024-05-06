@@ -27,7 +27,7 @@ def main():
     # Temporary meta data files (CSV, TXT) (can't get temp.txt to be in this folder ;c)
     #temp_dr  = os.path.join(data_dr, "meta_data")
 
-    # directory to remove txt file
+    # directory to remove txt file (probably should be caled at end of file)
     meta_txt_dr = os.getcwd() + r"\data\input_images\temp.txt"
     # directory to remove csv file
     meta_csv_dr = os.getcwd() + r"\data\meta_data\temp.csv"
@@ -38,27 +38,28 @@ def main():
 
     edit = ExifTool(img_file, exif_tool, data_dr, output_file, user_pref)
 
-    #edit.print_metadata() #PRINT METADATA OF IMAGE
-    edit.temp_metadata_txt() #TRANSLATE METADATA TO TXT NEEDED FOR ALL FUNCTIONS
-    #edit.temp_metadata_csv() #TRANSLATE METADATA TO CSV
+    #edit.print_metadata() # Print metadata of image to terminal
+    edit.temp_metadata_txt() # Translate metadata to txt !!NEEDED FOR BASICALLY ALL FUNCTIONS!!
+    #edit.temp_metadata_csv() # Translate metadata to cvs (Not needed tbh)
     
-    data_type = deviceTags
-    edit.metadata_caption(data_type) #put wanted datatype here 
-    #edit.delete_metadata_add_caption(data_type)
-    #edit.delete_all_metadata()
-    #edit.delete_geo_tag()
-    #edit.delete_device_tags()
+    # data_type = deviceTags # CHANGE to any data type from helper class
+    # edit.metadata_caption(data_type) # Add datetype fields to caption
+    #edit.delete_metadata_add_caption(data_type) # Delete all metadata and add datetype fields to caption
+
+    #edit.delete_all_metadata() # Delete all metadata
+    #edit.delete_geo_tag() # Deletes all geo tags
+    #edit.delete_device_tags() #deletes all device tags
+    #edit.delete_time()
 
     # time_preference = "2024:05:10 12:00:00"
     # edit.edit_time(time_preference)
-    #edit.delete_time()
-    # latitude, latref, longitude, longref, altitude, altref = "00 deg 00' 0.00\"", "North", "00 deg 00' 0.00\"", "East", "00 deg 00' 0.00\"", "Above Sea Level" 
+    # latitude, latref, longitude, longref, altitude, altref = "00 deg 00' 0.00\"", "South", "00 deg 00' 0.00\"", "West", "10000000", "Unknown" 
     # edit.edit_gps(latitude, latref, longitude, longref, altitude, altref)
     # make, model, sn = "CAMERA_NAME", "COOL", "11111"
     # edit.edit_device_tags(make, model, sn)
 
-    edit.output_metadata_txt() # just for testing to check output
-
+    edit.output_metadata_txt() # just for testing to check output (this will not work if an output file instet pre)
+    # edit. remove_metadata(meta_txt_dr) # Use at end to remove all temp.txt files in input_images 
 if __name__ == "__main__":
     main()
 
