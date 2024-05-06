@@ -1,9 +1,9 @@
 ExifTool Version Number         : 12.83
 File Name                       : output.jpg
 Directory                       : C:/Users/jules/Documents/Brown Work/Spring 2024/CS 1952B/Final Project/MetaAlign/1952B-MetaAlign/data/output_images
-File Size                       : 162 kB
-File Modification Date/Time     : 2024:05:06 14:02:20-04:00
-File Access Date/Time           : 2024:05:06 14:02:20-04:00
+File Size                       : 161 kB
+File Modification Date/Time     : 2024:05:06 16:13:24-04:00
+File Access Date/Time           : 2024:05:06 16:13:24-04:00
 File Creation Date/Time         : 2024:05:04 21:13:23-04:00
 File Permissions                : -rw-rw-rw-
 File Type                       : JPEG
@@ -18,12 +18,15 @@ X Resolution                    : 300
 Y Resolution                    : 300
 Resolution Unit                 : inches
 Software                        : Nikon Transfer 1.1 W
+Modify Date                     : 2024:05:10 12:00:00
 Y Cb Cr Positioning             : Centered
 Exposure Time                   : 1/75
 F Number                        : 5.9
 Exposure Program                : Program AE
 ISO                             : 64
 Exif Version                    : 0220
+Date/Time Original              : 2024:05:10 12:00:00
+Create Date                     : 2024:05:10 12:00:00
 Components Configuration        : Y, Cb, Cr, -
 Exposure Compensation           : 0
 Max Aperture Value              : 2.7
@@ -91,11 +94,13 @@ Subject Distance Range          : Unknown
 GPS Latitude Ref                : North
 GPS Longitude Ref               : East
 GPS Altitude Ref                : Above Sea Level
+GPS Time Stamp                  : 14:27:07.24
 GPS Satellites                  : 06
 GPS Img Direction Ref           : Unknown ()
 GPS Map Datum                   : WGS-84
+GPS Date Stamp                  : 2008:10:23
 Compression                     : JPEG (old-style)
-Thumbnail Offset                : 4404
+Thumbnail Offset                : 4560
 Thumbnail Length                : 6702
 Image Width                     : 640
 Image Height                    : 480
@@ -103,8 +108,9 @@ Encoding Process                : Baseline DCT, Huffman coding
 Bits Per Sample                 : 8
 Color Components                : 3
 Y Cb Cr Sub Sampling            : YCbCr4:2:2 (2 1)
-XMP Toolkit                     : Public XMP Toolkit Core 3.5
+XMP Toolkit                     : Image::ExifTool 12.83
 Rating Percent                  : 0
+Caption                         :  Make: NIKON. Camera Model Name: COOLPIX P6000. Serial Number:
 Comment                         : Date/Time Original: 2008:10:22 16:28:39.Create Date: 2008:10:22 16:28:39.GPS Date/Time: 2008:10:23 14:27:07.24Z.GPS Date Stamp: 2008:10:23.File Modification Date/Time: 2024:05:03 21:07:45-04:00.File Access Date/Time: 2024:05:03 21:07:45-04:00.File Creation Date/Time: 2024:04:20 12:30:43-04:00.Modify Date: 2008:11:01 21:15:07.
 Aperture                        : 5.9
 Image Size                      : 640x480
@@ -112,6 +118,7 @@ Megapixels                      : 0.307
 Scale Factor To 35 mm Equivalent: 4.7
 Shutter Speed                   : 1/75
 Thumbnail Image                 : (Binary data 6702 bytes, use -b option to extract)
+GPS Date/Time                   : 2008:10:23 14:27:07.24Z
 GPS Latitude                    : 43 deg 28' 2.81" N
 GPS Longitude                   : 11 deg 53' 6.46" E
 Circle Of Confusion             : 0.006 mm

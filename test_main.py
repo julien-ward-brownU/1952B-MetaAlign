@@ -42,8 +42,8 @@ def main():
     edit.temp_metadata_txt() #TRANSLATE METADATA TO TXT NEEDED FOR ALL FUNCTIONS
     #edit.temp_metadata_csv() #TRANSLATE METADATA TO CSV
     
-    # data_type = deviceTags
-    # edit.metadata_caption(data_type) #put wanted datatype here 
+    data_type = deviceTags
+    edit.metadata_caption(data_type) #put wanted datatype here 
     #edit.delete_metadata_add_caption(data_type)
     #edit.delete_all_metadata()
     #edit.delete_geo_tag()
@@ -51,7 +51,7 @@ def main():
 
     # time_preference = "2024:05:10 12:00:00"
     # edit.edit_time(time_preference)
-    edit.delete_time()
+    #edit.delete_time()
     # latitude, latref, longitude, longref, altitude, altref = "00 deg 00' 0.00\"", "North", "00 deg 00' 0.00\"", "East", "00 deg 00' 0.00\"", "Above Sea Level" 
     # edit.edit_gps(latitude, latref, longitude, longref, altitude, altref)
     # make, model, sn = "CAMERA_NAME", "COOL", "11111"

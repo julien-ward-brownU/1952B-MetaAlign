@@ -108,7 +108,7 @@ class ExifTool:
     # creates a csv file using pandas dataframe to convert a dictionary to a csv.
     def temp_metadata_csv(self):
 
-        # Convert to DataFrame and save as CSV
+        # Convert dictionary to DataFrame and save as CSV
         data = self.temp_metadata_dic()
         df = pd.DataFrame([data])
         df.to_csv(self.data + r'\meta_data\temp.csv')
@@ -116,25 +116,34 @@ class ExifTool:
 
     '''
     Turn specific data type in metadata into a string to be added to captions.
-    :param (list) data: List of a specific dataType that wants to be accessed and manipulated. (List from helper_classes.py)
+
+    :param (list) data_type: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
     '''
-    #TODO should take in what you want to save into caption
-    def caption_string(self, data):
+    def caption_string(self, data_type):
         data = self.temp_metadata_dic() # get dictionary metadata
         meta_string = ''
-        # you can change this to whatever is in the helper function
-        for item in data:
-            meta_string += item + ": " + data[item] + "\n"
+
+        # Loop through the data type list, access the data from the dictionary and add
+        for item in data_type:
+            if item in data.keys():
+                meta_string += " " + item + ": " + data[item] + "\n"
+            else:
+                meta_string += " " + item + ": "
         return meta_string
     
-    # This just takes metadata preferences and add its to comment/caption
-    def metadata_caption(self, datatype):
+    '''
+    Turn specific data type in metadata into a string, by calling caption_string, then add this string of metadata to the caption.
+
+    :param (list) data_type: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
+    '''
+    def metadata_caption(self, data_type):
         if os.path.exists(self.output):
             self.remove_metadata(self.output)
-        # TODO: need to change the input to this to whatever the user preference is
-        meta_string = self.caption_string(datatype)
 
-        command = [self.exif, "-comment="+ meta_string, "-o",  self.output, self.img]
+        # TODO: need to change the input to this to whatever the user preference is
+        meta_string = self.caption_string(data_type)
+
+        command = [self.exif, "-caption="+ meta_string, "-o",  self.output, self.img]
         
         result = subprocess.run(command)
         if result.returncode == 0:
@@ -142,6 +151,11 @@ class ExifTool:
         else:
             print("Error adding meta data to caption:", result)
 
+    '''
+    Turn specific data type in metadata into a string, by calling caption_string, then add this string of metadata to the caption.
+
+    :param (list) datatype: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
+    '''
     # Deletes all metadata and adds preference to caption/comment (idk which one to pick)
     def delete_metadata_add_caption(self, datatype):
         # This prevents an error of the file already existing
@@ -150,7 +164,7 @@ class ExifTool:
         # TODO: need to change the input to this to whatever the user preference is
         meta_string = self.caption_string(datatype)
 
-        command = [self.exif, "-all=","-comment="+ meta_string, "-o",  self.output,  self.img]
+        command = [self.exif, "-all=","-caption="+ meta_string, "-o",  self.output,  self.img]
         result = subprocess.run(command)
 
         if result.returncode == 0:
@@ -158,7 +172,9 @@ class ExifTool:
         else:
             print("Error deleting and adding meta data to caption:", result)
 
-    # Deletes all metadata
+    '''
+    Delete all metadata (that is possible to delete) in the image.
+    '''
     def delete_all_metadata(self):
 
         # This prevents an error of the file already existing
@@ -173,6 +189,11 @@ class ExifTool:
         else:
             print("Error deleting all meta data: ", result)
 
+    '''
+    Edit and change the granularity of GPS metadata.
+
+    :param (str) latitude: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
+    '''
     # Input Format: "00 deg 00' 0.00\" N", "00 deg 00' 0.00\" E", "00 deg 00' 0.00\" N, 00 deg 00' 0.00\" E"
     def edit_gps(self, latitude, lat_ref, longitude, long_ref, altitude, alt_ref):
         
