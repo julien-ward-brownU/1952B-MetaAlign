@@ -49,14 +49,14 @@ def main():
     #edit.delete_all_metadata() # Delete all metadata
     #edit.delete_geo_tag() # Deletes all geo tags
     #edit.delete_device_tags() #deletes all device tags
-    #edit.delete_time()
+    #edit.delete_time() #deletes all time tags
 
-    # time_preference = "2024:05:10 12:00:00"
-    # edit.edit_time(time_preference)
+    # time_preference = "2024:05:10 12:00:00" #preference should come from userpreference class
+    # edit.edit_time(time_preference) #edit all time based on preferences
     # latitude, latref, longitude, longref, altitude, altref = "00 deg 00' 0.00\"", "South", "00 deg 00' 0.00\"", "West", "10000000", "Unknown" 
-    # edit.edit_gps(latitude, latref, longitude, longref, altitude, altref)
+    # edit.edit_gps(latitude, latref, longitude, longref, altitude, altref) # edit gps based on userpreference class
     # make, model, sn = "CAMERA_NAME", "COOL", "11111"
-    # edit.edit_device_tags(make, model, sn)
+    # edit.edit_device_tags(make, model, sn) # edit gps based on userpreference class
 
     edit.output_metadata_txt() # just for testing to check output (this will not work if an output file instet pre)
     # edit. remove_metadata(meta_txt_dr) # Use at end to remove all temp.txt files in input_images 
