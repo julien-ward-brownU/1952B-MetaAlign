@@ -28,7 +28,7 @@ class UserPreferences:
         self.is_default = True
 
     # Code to move to other classes
-    
+    # TODO: Uncomment, I had to comment this because doesnt let me run code with it LOL
     # Maybe have a pickle file that on start up gets loaded? 
     # preferences: list[UserPreferences] = list()
     

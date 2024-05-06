@@ -2,8 +2,7 @@ from enum import Enum
 
 # Shared classes to be used by preferences and edit
 
-timeTags = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "File Modification Date/Time",
-"File Access Date/Time", "File Creation Date/Time", "Modify Date"]
+timeTags = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date"]
 
 locationTags = ["GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
                 "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 

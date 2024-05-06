@@ -10,11 +10,12 @@ Method takes in two file locations and returns the metadata into the command lin
 '''
 
 class ExifTool:
-    def __init__(self, img, exif_tool, data_dr, output_dr):
+    def __init__(self, img, exif_tool, data_dr, output_dr, preferences):
         self.img = img
         self.exif = exif_tool
         self.data = data_dr
         self.output = output_dr
+        self.preferences = preferences
         
     def print_metadata(self):
         # The command is list of the exiftool.exe and the image location
@@ -31,6 +32,21 @@ class ExifTool:
             self.remove_metadata(metadata_txt)
 
         command = [self.exif, '-w', '%dtemp.txt',  self.img]
+        result = subprocess.run(command)
+
+        if result.returncode == 0:
+            print("Meta_data text file was created successfully.")
+        else:
+            print("Error creating meta_data text file:", print(result))
+        
+    # get metadata and exports it into txt file SPECIFICALLY to check output file txt has changed
+    def output_metadata_txt(self):
+        metadata_txt = os.path.join(self.data, "output_images", "temp.txt")
+        # Does a temp already exist? If so remove it!
+        if os.path.exists(metadata_txt):
+            self.remove_metadata(metadata_txt)
+
+        command = [self.exif, '-w', '%dtemp.txt',  self.output]
         result = subprocess.run(command)
 
         if result.returncode == 0:
@@ -136,6 +152,103 @@ class ExifTool:
             print("GEO Meta data sucessfully removed.")
         else:
             print("Error removing geo metadata: ", result)
+
+    # Input Format: "00 deg 00' 0.00\" N", "00 deg 00' 0.00\" E", "00 deg 00' 0.00\" N, 00 deg 00' 0.00\" E"
+    def edit_gps(self, latitude, lat_ref, longitude, long_ref, altitude, alt_ref):
+        
+        # This prevents an error of the file already existing
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
+
+        command = [self.exif,
+            f"-GPSLatitude={latitude}", # Set latitude metadata to the new latitude 
+            f"-GPSLatitudeRef={lat_ref}",
+            f"-GPSLongitude={longitude}",  # Set longitude metadata to the new longitude
+            f"-GPSLongitudeRef={long_ref}",
+            f"-GPSAltitude={altitude}",  # Set altitude metadata to the new altitude
+            f"-GPSAltitudeRef={alt_ref}",
+            "-o", self.output, self.img]
+        result = subprocess.run(command)
+        
+        # Check if the command executed successfully
+        if result.returncode == 0:
+            print("Geo metadata edited successfully.")
+        else:
+            print("Error editing Geo metadata:", result)
+
+    # new_time: "2024:05:10 12:00:00"
+    def edit_time(self, new_time):
+        
+        # This prevents an error of the file already existing
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
+
+        command = [
+            self.exif,
+            f"-AllDates={new_time}",  # Set all date/time metadata to the new time
+            f"-GPSTimeStamp={new_time}",  # Set GPS TimeStamp to the new time
+            f"-GPSDateStamp={new_time}",  # Set GPS DateStamp to the new time
+            "-o", self.output,  # Output file path
+            self.img  # Input file path
+        ]
+ 
+        result = subprocess.run(command)
+        
+        # Check if the command executed successfully
+        if result.returncode == 0:
+            print("Time metadata edited successfully.")
+        else:
+            print("Error editing time metadata:", result)
+
+    # Input Format: "make", "model", "sn"
+    def edit_device_tags(self, make, model, serial_num):
+        
+        # This prevents an error of the file already existing
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
+
+        command = [
+            self.exif,
+            f"-Make={make}",  # Set make of the camera
+            f"-model={model}",  # Set the model of the camera
+            f"-SerialNumber={serial_num}",  # Set serial number of the camera
+            "-o", self.output,  # Output file path
+            self.img  # Input file path
+        ]
+ 
+        result = subprocess.run(command)
+        
+        # Check if the command executed successfully
+        if result.returncode == 0:
+            print("Camera metadata edited successfully.")
+        else:
+            print("Error editing camera metadata:", result)
+    
+    def delete_device_tags(self):
+        
+        # This prevents an error of the file already existing
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
+
+        command = [
+            self.exif,
+            f"-Make=",  # Delete make of the camera
+            f"-model=",  # Delete the model of the camera
+            f"-SerialNumber=",  # Delete serial number of the camera
+            "-o", self.output,  # Output file path
+            self.img  # Input file path
+        ]
+ 
+        result = subprocess.run(command)
+        
+        # Check if the command executed successfully
+        if result.returncode == 0:
+            print("Camera metadata deleted successfully.")
+        else:
+            print("Error deleting camera metadata:", result)
+
+
+    
     
 
 
