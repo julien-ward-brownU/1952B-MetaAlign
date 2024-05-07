@@ -2,12 +2,7 @@ from enum import Enum
 
 # Shared classes to be used by preferences and edit
 
-# Grouping tags! 
-timeTags = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date"]
-locationTags = ["GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
-                "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 
-                "GPS Map Datum"]
-deviceTags = ["Make", "Camera Model Name", "Serial Number"]
+
 
 class DataType(Enum):
     ALL = 0
@@ -30,6 +25,34 @@ class Granularity(Enum):
     LOW = 1
     MEDIUM = 2
     HIGH = 3
+
+
+def exif_tags(type: DataType):
+    tags = []
+    text = []
+    match type:
+        case DataType.TIME:
+            tags = [f"-AllDates=", f"-GPSTimeStamp=", f"-GPSDateStamp=", "-o"]
+            text = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date"]
+        case DataType.LOCATION: 
+            tags = [ "-gps:all=", "-o"]
+            text = ["GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
+                "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 
+                "GPS Map Datum"]
+        case DataType.CAMERA_TYPE:
+            tags = [f"-Make=", f"-model=",  f"-SerialNumber=",  "-o"]
+            text = ["Make", "Camera Model Name", "Serial Number"]
+        case DataType.CAMERA_SETTINGS:
+            tags = [ "-all=", "-o"]
+            # easier to change this to whats not in the other ones
+            text = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date", "GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
+                "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 
+                "GPS Map Datum", "Make", "Camera Model Name", "Serial Number" ]
+
+    return tags, text
+
+# Grouping tags! 
+
 
 
 # TODO: Pseudocode - Image Upload Detection 

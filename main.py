@@ -40,7 +40,7 @@ def main():
     # directory to remove csv file
     meta_csv_dr = os.getcwd() + r"\data\meta_data\temp.csv"
 
-    edit = ExifTool(img_file, exif_tool, data_dr, output_file, pref)
+    edit = ExifTool(img_file, exif_tool, data_dr, output_file)
     #edit.print_metadata() # Print metadata of image to terminal
     edit.temp_metadata_txt() # Translate metadata to txt !!NEEDED FOR BASICALLY ALL FUNCTIONS!!
     #edit.temp_metadata_csv() # Translate metadata to cvs (Not needed tbh)
@@ -95,6 +95,8 @@ def get_preferences(website, preferences):
         # else: no prefernces founf
     return set_new_prefernces(website)
 
+# see create_new_preferences in the preferences class for what this would look like, would be the 
+# input from some UI that we did not get functional. 
 def set_new_prefernces(website): 
     return
 

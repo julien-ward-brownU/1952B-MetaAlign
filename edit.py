@@ -2,6 +2,9 @@
 import subprocess
 import os
 import pandas as pd
+from preferences import *
+from helper_classes import *
+import datetime
 
 '''
 ExifTool class manipulates meta data of an image by accessing the orginal ExifTool through the command line (https://exiftool.org/).
@@ -13,12 +16,59 @@ ExifTool class manipulates meta data of an image by accessing the orginal ExifTo
 :param (str) preferences: User preferences to decided how to manipulate the metadata.  (OS format)
 '''
 class ExifTool:
-    def __init__(self, img, exif_tool, data_dr, output_dr, preferences):
+    def __init__(self, img, exif_tool, data_dr, output_dr):
         self.img = img
         self.exif = exif_tool
         self.data = data_dr
         self.output = output_dr
-        self.preferences = preferences
+
+
+    def delete(self, data: DataType):
+
+        # This prevents an error of the file already existing
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
+
+        # Command to call exiftool to delete all the metadata in exif_tags and output the new image in the outputs folder
+        command = [self.exif]
+        tags, text = exif_tags(data)
+        comand += tags
+        command += [self.output, self.img]
+        result = subprocess.run(command)
+
+        if result.returncode == 0:
+            print("Metadata sucessfully removed.")
+        else:
+            print("Error removing metadata: ", result)
+    
+
+    '''
+    Turn specific data type in metadata into a string, by calling caption_string, then add this string of metadata to to the metadata field "Caption".
+
+    :param (list) datatype: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
+    '''
+    # Deletes all metadata and adds preference to caption/comment (idk which one to pick)
+    def caption(self, datatype: DataType):
+        # This prevents an error of the file already existing
+        if os.path.exists(self.output):
+            self.remove_metadata(self.output)
+        # TODO: need to change the input to this to whatever the user preference is
+        meta_string = self.caption_string(datatype)
+
+        command = [self.exif, "-all=","-caption="+ meta_string, "-o",  self.output,  self.img]
+        result = subprocess.run(command)
+
+        if result.returncode == 0:
+            print("Meta data sucessfully deleted and added to caption.")
+        else:
+            print("Error deleting and adding meta data to caption:", result)
+
+
+
+    def obscure(self, data: DataType, rand_type: EditType, gran: Granularity): 
+
+        match data:
+            case 
     
     '''
     Prints all available metadata of input file into terminal.
@@ -126,15 +176,22 @@ class ExifTool:
     :return (str) meta_string: A string of a subset of metadata based on the data_type (user preference).
     '''
     def caption_string(self, data_type):
-        data = self.temp_metadata_dic() # get dictionary metadata
+        tags, data = exif_tags(data_type) # get dictionary metadata
         meta_string = ''
 
         # Loop through the data type list, access the data from the dictionary and add
-        for item in data_type:
-            if item in data.keys():
-                meta_string += " " + item + ": " + data[item] + "\n"
-            else:
-                meta_string += " " + item + ": "
+        if data_type != DataType.CAMERA_SETTINGS:
+            for item in data_type:
+                if item in data.keys():
+                    meta_string += " " + item + ": " + data[item] + "\n"
+                else:
+                    meta_string += " " + item + ": "
+        else: # this is because the settings list is just what is not settings
+                if item not in data.keys():
+                    meta_string += " " + item + ": " + data[item] + "\n"
+                else:
+                    meta_string += " " + item + ": "
+
         return meta_string
     
     '''
@@ -158,26 +215,7 @@ class ExifTool:
         else:
             print("Error adding meta data to caption:", result)
 
-    '''
-    Turn specific data type in metadata into a string, by calling caption_string, then add this string of metadata to to the metadata field "Caption".
 
-    :param (list) datatype: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
-    '''
-    # Deletes all metadata and adds preference to caption/comment (idk which one to pick)
-    def delete_metadata_add_caption(self, datatype):
-        # This prevents an error of the file already existing
-        if os.path.exists(self.output):
-            self.remove_metadata(self.output)
-        # TODO: need to change the input to this to whatever the user preference is
-        meta_string = self.caption_string(datatype)
-
-        command = [self.exif, "-all=","-caption="+ meta_string, "-o",  self.output,  self.img]
-        result = subprocess.run(command)
-
-        if result.returncode == 0:
-            print("Meta data sucessfully deleted and added to caption.")
-        else:
-            print("Error deleting and adding meta data to caption:", result)
 
     '''
     Delete all metadata (that is possible to delete) in the image.
