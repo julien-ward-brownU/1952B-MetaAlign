@@ -30,18 +30,18 @@ def exif_tags(type: DataType):
     text = []
     match type:
         case DataType.TIME:
-            tags = [f"-AllDates=", f"-GPSTimeStamp=", f"-GPSDateStamp=", "-o"]
+            tags = [f"-AllDates=", f"-GPSTimeStamp=", f"-GPSDateStamp="]
             text = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date"]
         case DataType.LOCATION: 
-            tags = [ "-gps:all=", "-o"]
+            tags = [ "-gps:all="]
             text = ["GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
                 "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 
                 "GPS Map Datum"]
         case DataType.CAMERA_TYPE:
-            tags = [f"-Make=", f"-model=",  f"-SerialNumber=",  "-o"]
+            tags = [f"-Make=", f"-model=",  f"-SerialNumber="]
             text = ["Make", "Camera Model Name", "Serial Number"]
         case DataType.CAMERA_SETTINGS:
-            tags = [ "-all=", "-o"]
+            tags = [ "-all="]
             # easier to change this to whats not in the other ones
             text = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date", "GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
                 "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 

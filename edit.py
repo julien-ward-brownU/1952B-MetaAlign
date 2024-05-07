@@ -1,7 +1,6 @@
 # subprocess API: https://docs.python.org/3/library/subprocess.html#subprocess.run
-import subprocess
-# ANNOTATION: 
-import os
+import subprocess # ANNOTATION: The use of subprocess has been used to help run exiftool as it is used through a command prompt.
+import os # Additionally, os is directly access the users file systems which is required to access images. 
 import pandas as pd
 from preferences import *
 from helper_classes import *
@@ -18,7 +17,7 @@ ExifTool class manipulates meta data of an image by accessing the orginal ExifTo
 '''
 
 # ANNOTATIONS: This class controls the manipulation of the metadata using exiftool. This ensures that we as the developers can directly control how the metadata is being manipulated and to
-# what extremities 
+# what extremities.
 class ExifTool:
     def __init__(self, img, exif_tool, data_dr, output_dr):
         self.img = img
@@ -29,18 +28,14 @@ class ExifTool:
 
     def delete(self, data: DataType):
 
-        # This prevents an error of the file already existing
-        if os.path.exists(self.output):
-            self.remove_metadata(self.output)
-
         # Command to call exiftool to delete all the metadata in exif_tags and output the new image in the outputs folder
         command = [self.exif]
         tags, text = exif_tags(data)
         command += tags
-        command += [self.output, self.img]
+        command += [self.img]
+        # ANNOTATIONS. This is a necessary call to run the exiftool but ideally we wouldn't be using these types of commands if it was a web app or IOS feature, as this can be super invase and 
+        # provide privacy concerns as it is accessing the terminal.  
         result = subprocess.run(command)
-
-        self.img = self.output # to keep updating on the new image
 
         if result.returncode == 0:
             print("Metadata sucessfully removed.")
@@ -55,19 +50,11 @@ class ExifTool:
     '''
     # Deletes all metadata and adds preference to caption/comment (idk which one to pick)
     def caption(self, datatype: DataType):
-        # This prevents an error of the file already existing
-        if os.path.exists(self.output):
-            self.remove_metadata(self.output)
 
-        # TODO: need to change the input to this to whatever the user preference is
         meta_string = self.caption_string(datatype, False)
-        print(meta_string)
-        command = [self.exif, "-comment=" + meta_string, "-o", self.output, self.img]
+        command = [self.exif, "-comment=" + meta_string, self.img]
         result = subprocess.run(command)
 
-        self.img = self.output
-
-        print(command)
         if result.returncode == 0:
             print("Meta data sucessfully deleted and added to caption.")
         else:
@@ -93,13 +80,13 @@ class ExifTool:
                 self.edit_device_tags(make, model, serial_num)
             case DataType.CAMERA_SETTINGS:
                 pass
-        
-        self.img = self.output
     
     def newTime(rand_type, gran, currentData):
-        
+        oldTime = currentData.keys()[0]
         start = 0
         end = 0
+
+        
         if end > datetime.NOW:
             end = datetime.NOW
 
@@ -130,6 +117,7 @@ class ExifTool:
     '''
     Accesses input file metadata to export and temporarly store data in a text file within the input_images folder. 
     '''
+    # ANNOTATION: Storing metadata in a txt is a key component to storing data, as it provides a simple way to store data that can later be deleted. 
     def temp_metadata_txt(self):
 
         metadata_txt = os.path.join(self.data, "input_images", "temp.txt")
@@ -145,7 +133,7 @@ class ExifTool:
         if result.returncode == 0:
             print("Input image meta_data text file was created successfully.")
         else:
-            print("Error creating input image meta_data text file:", print(result))
+            print("Error creating input image meta_data text file:", result)
     
     '''
     Accesses output file metadata to export and temporarly store data in a text file within the output_images 
@@ -166,13 +154,13 @@ class ExifTool:
             self.remove_metadata(metadata_txt)
 
         # Command to call exiftool to write the metadata to a .txt file
-        command = [self.exif, '-w', '%dtemp.txt',  self.output]
+        command = [self.exif, '-w', '%dtemp.txt',  self.img]
         result = subprocess.run(command)
 
         if result.returncode == 0:
             print("Output image meta_data text file was created successfully.")
         else:
-            print("Error creating output image meta_data text file:", print(result))
+            print("Error creating output image meta_data text file:", result)
 
     '''
     Delete file in path. Used to remove temporary metadata that are in text and csv files to preserve user privacy.
@@ -181,6 +169,8 @@ class ExifTool:
     '''
     def remove_metadata(self, file_path):
         print("Deleting file!")
+        # ANNOTATION: This is another example of a command that would not exist in an actual implementation of this software but since our database is local we still want to ensure image data is not 
+        # kept perserving users privacy. This would reflect how user metadata would be instantly deleted from the servers database after processing and use of the data had been done.
         os.remove(file_path) # ATTENTION!!!: Becareful what path you provide to this function! It will DELETE the file!!!
 
     '''
@@ -243,7 +233,6 @@ class ExifTool:
                     dictForm[item] = dic[item]
                 else:
                     meta_string += " " + item + ": "
-        print(meta_string)
         # return in dictionary form
         if flag:
             return dictForm
@@ -255,14 +244,12 @@ class ExifTool:
     :param (list) data_type: List of a specific dataType that will be accessed and manipulated. (List from helper_classes.py)
     '''
     def metadata_caption(self, data_type):
-        if os.path.exists(self.output):
-            self.remove_metadata(self.output)
 
         # TODO: need to change the input to this to whatever the user preference is
         meta_string = self.caption_string(data_type, False)
 
         # Command to call exiftool to write specific metadata to the metadata field "Caption" and output the new image in the outputs folder
-        command = [self.exif, "-caption="+ meta_string, "-o",  self.output, self.img]
+        command = [self.exif, "-caption="+ meta_string, self.img]
         result = subprocess.run(command)
 
         if result.returncode == 0:
@@ -271,18 +258,13 @@ class ExifTool:
             print("Error adding meta data to caption:", result)
 
 
-
     '''
     Delete all metadata (that is possible to delete) in the image.
     '''
     def delete_all_metadata(self):
 
-        # This prevents an error of the file already existing
-        if os.path.exists(self.output):
-            self.remove_metadata(self.output)
-
         # Command to call exiftool to delete all the metadata and output the new image in the outputs folder
-        command = [self.exif, "-all=", "-o", self.output, self.img]
+        command = [self.exif, "-all=", self.img]
         result = subprocess.run(command)
 
         if result.returncode == 0:
@@ -301,10 +283,7 @@ class ExifTool:
     :param (str) alt_ref: Format: "Above Sea Level", "Below Sea Level"
     '''
     def edit_gps(self, latitude, lat_ref, longitude, long_ref, altitude, alt_ref):
-        
-        # This prevents an error of the file already existing
-        if os.path.exists(self.output):
-            self.remove_metadata(self.output)
+
 
         # Command to call exiftool to edit GPS metadata and output the new image in the outputs folder
         command = [self.exif,
@@ -314,7 +293,7 @@ class ExifTool:
             f"-GPSLongitudeRef={long_ref}",
             f"-GPSAltitude={altitude}",  # Set altitude metadata to the new altitude
             f"-GPSAltitudeRef={alt_ref}",
-            "-o", self.output, self.img]
+            self.img]
         result = subprocess.run(command)
         
         # Check if the command executed successfully
@@ -323,23 +302,6 @@ class ExifTool:
         else:
             print("Error editing Geo metadata:", result)
     
-    '''
-    Delete all GEO metadata (that is possible to delete) in the image.
-    '''
-    def delete_geo_tag(self):
-
-        # This prevents an error of the file already existing
-        if os.path.exists(self.output):
-            self.remove_metadata(self.output)
-
-        # Command to call exiftool to delete all GPS metadata and output the new image in the outputs folder
-        command = [self.exif, "-gps:all=", "-o", self.output, self.img]
-        result = subprocess.run(command)
-
-        if result.returncode == 0:
-            print("GEO Meta data sucessfully removed.")
-        else:
-            print("Error removing geo metadata: ", result)
 
     '''
     Edit and change the values of the time metadata.
@@ -348,10 +310,6 @@ class ExifTool:
     Example: "2024:05:10 12:00:00"
     '''
     def edit_time(self, new_time):
-        
-        # This prevents an error of the file already existing
-        if os.path.exists(self.output):
-            self.remove_metadata(self.output)
 
         # Command to call exiftool to edit all time metadata and output the new image in the outputs folder
         command = [
@@ -359,7 +317,6 @@ class ExifTool:
             f"-AllDates={new_time}",  # Set all date/time metadata to the new time
             f"-GPSTimeStamp={new_time}",  # Set GPS TimeStamp to the new time
             f"-GPSDateStamp={new_time}",  # Set GPS DateStamp to the new time
-            "-o", self.output,  # Output file path
             self.img  # Input file path
         ]
         result = subprocess.run(command)
@@ -370,89 +327,32 @@ class ExifTool:
         else:
             print("Error editing time metadata:", result)
 
-        
-    # '''
-    # Delete all GEO metadata (that is possible to delete) in the image.
-    # '''
-    # def delete_time(self):
-        
-    #     # This prevents an error of the file already existing
-    #     if os.path.exists(self.output):
-    #         self.remove_metadata(self.output)
+    '''
+    Edit and change the values of the time metadata.
 
-    #     # Command to call exiftool to delete all time metadata and output the new image in the outputs folder
-    #     command = [
-    #         self.exif,
-    #         f"-AllDates=",  # Set all date/time metadata to the new time
-    #         f"-GPSTimeStamp=",  # Set GPS TimeStamp to the new time
-    #         f"-GPSDateStamp=",  # Set GPS DateStamp to the new time
-    #         "-o", self.output,  # Output file path
-    #         self.img  # Input file path
-    #     ]
-    #     result = subprocess.run(command)
+    :param (str) make: Format: "Make"
+    :param (str) model: Format: "Model"
+    :param (str) serial_num: Format: "Serial Number"
+    Example: "NIKON", "COOLPIX P6000", "12311"
+    '''
+    def edit_device_tags(self, make, model, serial_num):
         
-    #     # Check if the command executed successfully
-    #     if result.returncode == 0:
-    #         print("Time metadata deleted successfully.")
-    #     else:
-    #         print("Error deleting time metadata:", result)
-
-    # '''
-    # Edit and change the values of the time metadata.
-
-    # :param (str) make: Format: "Make"
-    # :param (str) model: Format: "Model"
-    # :param (str) serial_num: Format: "Serial Number"
-    # Example: "NIKON", "COOLPIX P6000", "12311"
-    # '''
-    # def edit_device_tags(self, make, model, serial_num):
+        # Command to call exiftool to edit camera metadata and output the new image in the outputs folder
+        command = [
+            self.exif,
+            f"-Make={make}",  # Set make of the camera
+            f"-model={model}",  # Set the model of the camera
+            f"-SerialNumber={serial_num}",  # Set serial number of the camera
+            self.img  # Input file path
+        ]
+        result = subprocess.run(command)
         
-    #     # This prevents an error of the file already existing
-    #     if os.path.exists(self.output):
-    #         self.remove_metadata(self.output)
-        
-    #     # Command to call exiftool to edit camera metadata and output the new image in the outputs folder
-    #     command = [
-    #         self.exif,
-    #         f"-Make={make}",  # Set make of the camera
-    #         f"-model={model}",  # Set the model of the camera
-    #         f"-SerialNumber={serial_num}",  # Set serial number of the camera
-    #         "-o", self.output,  # Output file path
-    #         self.img  # Input file path
-    #     ]
-    #     result = subprocess.run(command)
-        
-    #     # Check if the command executed successfully
-    #     if result.returncode == 0:
-    #         print("Camera metadata edited successfully.")
-    #     else:
-    #         print("Error editing camera metadata:", result)
+        # Check if the command executed successfully
+        if result.returncode == 0:
+            print("Camera metadata edited successfully.")
+        else:
+            print("Error editing camera metadata:", result)
     
-    # '''
-    # Delete all Camera metadata (that is possible to delete) in the image.
-    # '''
-    # def delete_device_tags(self):
-        
-    #     # This prevents an error of the file already existing
-    #     if os.path.exists(self.output):
-    #         self.remove_metadata(self.output)
-
-    #     # Command to call exiftool to delete camera metadata and output the new image in the outputs folder
-    #     command = [
-    #         self.exif,
-    #         f"-Make=",  # Delete make of the camera
-    #         f"-model=",  # Delete the model of the camera
-    #         f"-SerialNumber=",  # Delete serial number of the camera
-    #         "-o", self.output,  # Output file path
-    #         self.img  # Input file path
-    #     ]
-    #     result = subprocess.run(command)
-        
-    #     # Check if the command executed successfully
-    #     if result.returncode == 0:
-    #         print("Camera metadata deleted successfully.")
-    #     else:
-    #         print("Error deleting camera metadata:", result)
 
 
     

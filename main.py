@@ -38,7 +38,7 @@ def main():
     # directory to remove txt file (probably should be caled at end of file)
     meta_txt_dr = os.getcwd() + r"\data\input_images\temp.txt"
     # directory to remove csv file
-    #meta_csv_dr = os.getcwd() + r"\data\meta_data\temp.csv"
+    meta_csv_dr = os.getcwd() + r"\data\meta_data\temp.csv"
 
     edit = ExifTool(img_file, exif_tool, data_dr, output_file)
     #edit.print_metadata() # Print metadata of image to terminal
@@ -48,11 +48,10 @@ def main():
     adjust_metadata(edit, pref)
 
     image_upload(output_file, location)
-     # ANNOTATION: Remove all information Should delete all data except user preferences, 
+     # ANNOTATION: This call is especially important because it removes any temporary metadata that has been stored to be used for manipulation. This deletes those files.
      # should always be at the end
-    edit.output_metadata_txt() # just for testing to check output (this will not work if an output file instet pre)
-
-    edit.remove_metadata(meta_txt_dr)
+    #edit.remove_metadata(meta_txt_dr)
+    # edit.remove_metadata(meta_csv_dr)
 
 
 '''
@@ -73,9 +72,7 @@ def adjust_metadata(edit, pref):
         gran = [gran[0] * 4]
     
     # For each type of data, go through and perform the appropriate edit action
-    print("here")
     for i in range(len(data)):
-        print(edits[i])
         match (edits[i]):
             case EditType.KEEP: 
                 continue
@@ -114,7 +111,7 @@ def image_detection():
     """
     # TORUN: change these!!! 
     website = "instagram"
-    image_name = "flower.jpg"
+    image_name = "test_image.jpg"
     return website, image_name
 
 # TODO: Pseudocode - Image Deletion after use 
