@@ -50,8 +50,9 @@ def main():
     image_upload(output_file, location)
      # ANNOTATION: Remove all information Should delete all data except user preferences, 
      # should always be at the end
+    edit.output_metadata_txt() # just for testing to check output (this will not work if an output file instet pre)
+
     edit.remove_metadata(meta_txt_dr)
-    #edit.remove_metadata(meta_csv_dr)
 
 
 '''
@@ -63,7 +64,7 @@ def adjust_metadata(edit, pref):
 
     data = pref.data
     edits = pref.edits
-    gran = pref.gran
+    gran = pref.granularity
     # If someone has selected ALL, go through all categories
     if DataType.ALL in pref.data:
         data = [DataType.list()]
@@ -81,7 +82,7 @@ def adjust_metadata(edit, pref):
             case EditType.DELETE:
                 edit.delete(data[i])
             case EditType.CAPTION:
-                edit.addToCaption(data[i])
+                edit.caption(data[i])
             # Obscuring Data
             case EditType.RANDOM_PERIOD, EditType.RANDOM_WINDOW, EditType.DEFAULT:
                 edit.obscure(data[i], edits[i], gran[i])
@@ -103,6 +104,27 @@ def get_preferences(website, preferences):
 # input from some UI that we did not get functional. 
 def set_new_prefernces(website): 
     return
+
+# TODO: Pseudocode - Image Upload Detection 
+def image_detection():
+    """
+    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
+    input = detected_image
+    return name of the website, file name of the image. 
+    """
+    # TORUN: change these!!! 
+    website = "instagram"
+    image_name = "flower.jpg"
+    return website, image_name
+
+# TODO: Pseudocode - Image Deletion after use 
+def image_upload(image, website):
+    """
+    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
+    print("Deleting Image data file: ", input)
+    os.remove(image)
+    """
+    pass
 
 
 if __name__ == "__main__":

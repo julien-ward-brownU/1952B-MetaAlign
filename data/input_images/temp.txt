@@ -1,0 +1,22 @@
+ExifTool Version Number         : 12.83
+File Name                       : flower.jpg
+Directory                       : C:/Users/jules/Documents/Brown Work/Spring 2024/CS 1952B/Final Project/MetaAlign/1952B-MetaAlign/data/input_images
+File Size                       : 172 kB
+File Modification Date/Time     : 2024:05:06 23:13:41-04:00
+File Access Date/Time           : 2024:05:06 23:14:01-04:00
+File Creation Date/Time         : 2024:05:04 19:42:30-04:00
+File Permissions                : -rw-rw-rw-
+File Type                       : JPEG
+File Type Extension             : jpg
+MIME Type                       : image/jpeg
+XMP Toolkit                     : Image::ExifTool 12.83
+Caption                         :  GPS Position:  GPS Latitude:  GPS Longitude:  GPS Altitude Ref:  GPS Longitude Ref:  GPS Altitude Ref:  GPS Satellites:  GPS Img Direction RefGPS Map Datum:
+Comment                         :  GPS Position:  GPS Latitude:  GPS Longitude:  GPS Altitude Ref:  GPS Longitude Ref:  GPS Altitude Ref:  GPS Satellites:  GPS Img Direction RefGPS Map Datum:
+Image Width                     : 1280
+Image Height                    : 892
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:2:0 (2 2)
+Image Size                      : 1280x892
+Megapixels                      : 1.1

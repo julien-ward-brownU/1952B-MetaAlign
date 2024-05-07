@@ -53,24 +53,5 @@ def exif_tags(type: DataType):
 
 
 
-# TODO: Pseudocode - Image Upload Detection 
-def image_detection():
-    """
-    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
-    input = detected_image
-    return name of the website, file name of the image. 
-    """
-    # TORUN: change these!!! 
-    website = "instagram"
-    image_name = "test2.jpg"
-    return website, image_name
 
-# TODO: Pseudocode - Image Deletion after use 
-def image_upload(image, website):
-    """
-    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
-    print("Deleting Image data file: ", input)
-    os.remove(image)
-    """
-    pass
     
