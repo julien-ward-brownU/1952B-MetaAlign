@@ -32,7 +32,7 @@ class ExifTool:
         # Command to call exiftool to delete all the metadata in exif_tags and output the new image in the outputs folder
         command = [self.exif]
         tags, text = exif_tags(data)
-        comand += tags
+        command += tags
         command += [self.output, self.img]
         result = subprocess.run(command)
 
@@ -55,7 +55,7 @@ class ExifTool:
         # TODO: need to change the input to this to whatever the user preference is
         meta_string = self.caption_string(datatype)
 
-        command = [self.exif, "-all=","-caption="+ meta_string, "-o",  self.output,  self.img]
+        command = [self.exif,"-caption="+ meta_string, "-o",  self.output,  self.img]
         result = subprocess.run(command)
 
         if result.returncode == 0:
@@ -63,12 +63,20 @@ class ExifTool:
         else:
             print("Error deleting and adding meta data to caption:", result)
 
+        # deletes the metadata after adding to caption (could be designed so theres an option for this)
+        self.delete(DataType)
 
 
-    def obscure(self, data: DataType, rand_type: EditType, gran: Granularity): 
 
-        match data:
-            case 
+    # def obscure(self, data: DataType, rand_type: EditType, gran: Granularity): 
+
+    #     match data:
+    #         case DataType.TIME:
+    #         case DataType.LOCATION:
+    #         case DataType.CAMERA_TYPE:
+    #         case DataType.CAMERA_SETTINGS:
+        
+    #     pass
     
     '''
     Prints all available metadata of input file into terminal.

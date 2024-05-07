@@ -2,8 +2,6 @@ from enum import Enum
 
 # Shared classes to be used by preferences and edit
 
-
-
 class DataType(Enum):
     ALL = 0
     TIME = 1
@@ -56,7 +54,7 @@ def exif_tags(type: DataType):
 
 
 # TODO: Pseudocode - Image Upload Detection 
-def image_detection(image):
+def image_detection():
     """
     Detects when image is uploaded onto website and stores image temp into placeholder value (input).
     input = detected_image

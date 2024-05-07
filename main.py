@@ -10,7 +10,7 @@ def main():
     # Ideally, this is a database, but for now I have just made some examples for demonstration
     preferences: list[UserPreferences] = list()
     pref_one = UserPreferences("instagram", [DataType.TIME, DataType.LOCATION, DataType.CAMERA_TYPE],
-                               [EditType.DEFAULT, EditType.RANDOM_PERIOD, EditType.DELETE],
+                               [EditType.KEEP, EditType.CAPTION, EditType.DELETE],
                                 [Granularity.MEDIUM, Granularity.HIGH, Granularity.NOT_APPLICABLE], False)
     pref_two = UserPreferences("facebook", [DataType.TIME, DataType.LOCATION, DataType.CAMERA_TYPE],
                                [EditType.KEEP, EditType.CAPTION, EditType.RANDOM_WINDOW],
@@ -38,7 +38,7 @@ def main():
     # directory to remove txt file (probably should be caled at end of file)
     meta_txt_dr = os.getcwd() + r"\data\input_images\temp.txt"
     # directory to remove csv file
-    meta_csv_dr = os.getcwd() + r"\data\meta_data\temp.csv"
+    #meta_csv_dr = os.getcwd() + r"\data\meta_data\temp.csv"
 
     edit = ExifTool(img_file, exif_tool, data_dr, output_file)
     #edit.print_metadata() # Print metadata of image to terminal
@@ -72,8 +72,10 @@ def adjust_metadata(edit, pref):
         gran = [gran[0] * 4]
     
     # For each type of data, go through and perform the appropriate edit action
-    for i in len(data):
-        match edits[i]:
+    print("here")
+    for i in range(len(data)):
+        print(edits[i])
+        match (edits[i]):
             case EditType.KEEP: 
                 continue
             case EditType.DELETE:
@@ -83,7 +85,9 @@ def adjust_metadata(edit, pref):
             # Obscuring Data
             case EditType.RANDOM_PERIOD, EditType.RANDOM_WINDOW, EditType.DEFAULT:
                 edit.obscure(data[i], edits[i], gran[i])
-    
+            case _:
+                print("Error in match and case")
+                
 
 # Helper Methods for setup
 
