@@ -2,39 +2,102 @@ from preferences import UserPreferences
 from edit import ExifTool
 import os
 import argparse
-from helper_classes import image_detection, image_deletion
+from helper_classes import *
 
 
 def main():
-    # Take in user preferences (for our simple case we will use the terminal inputs of the user: main.py preferences img_in_file)
-    # print image metadata to terminal using ExifTool class function print_metadata
-    # give user preferences to preferences class parse metadata for prefereces
-    # scrub original image
-    # add parsed preferences to caption
+
+    # Ideally, this is a database, but for now I have just made some examples for demonstration
+    preferences: list[UserPreferences] = list()
+    pref_one = UserPreferences("instagram", [DataType.TIME, DataType.LOCATION, DataType.CAMERA_TYPE],
+                               [EditType.DEFAULT, EditType.RANDOM_PERIOD, EditType.DELETE],
+                                [Granularity.MEDIUM, Granularity.HIGH, Granularity.NOT_APPLICABLE], False)
+    pref_two = UserPreferences("facebook", [DataType.TIME, DataType.LOCATION, DataType.CAMERA_TYPE],
+                               [EditType.KEEP, EditType.CAPTION, EditType.RANDOM_WINDOW],
+                                [Granularity.NOT_APPLICABLE, Granularity.NOT_APPLICABLE, Granularity.LOW], False)
+    pref_all = UserPreferences("default", [DataType.ALL], [EditType.DELETE], [Granularity.NOT_APPLICABLE], True)
+    preferences = [pref_one, pref_two, pref_all]
+
+    # Detect where an image is being uploaded and get the prefereces for that site (or make a new one)
+    location, image_name = image_detection()
+    pref = get_preferences(location, preferences)
     
-    img_dr = os.getcwd() + r"\data\input_images\DSCN0010 test.jpg"
-    exif_tool_dr= os.getcwd() + r"/ExifTool/exiftool.exe"
-    data_dr = os.getcwd() + r"\data"
-    # directory to remove txt file
+    # Image file
+    img_file = os.path.join(os.getcwd(), "data", "input_images", image_name)
+    # to check if output file has 
+    #img_file = os.path.join(os.getcwd(), "data", "output_images", "output.jpg")
+    # ExifTool file
+    exif_tool = os.path.join(os.getcwd(), "exiftool.exe")
+    # Data directory; Includes: input images, temp meta data and output images
+    data_dr = os.path.join(os.getcwd(), "data")
+    # output file for image created
+    output_file  = os.path.join(data_dr, "output_images", "output.jpg") 
+    # Temporary meta data files (CSV, TXT) (can't get temp.txt to be in this folder ;c)
+    #temp_dr  = os.path.join(data_dr, "meta_data")
+
+    # directory to remove txt file (probably should be caled at end of file)
     meta_txt_dr = os.getcwd() + r"\data\input_images\temp.txt"
     # directory to remove csv file
     meta_csv_dr = os.getcwd() + r"\data\meta_data\temp.csv"
 
-    # Access user preferences
-    user_pref = UserPreferences()
+    edit = ExifTool(img_file, exif_tool, data_dr, output_file, pref)
+    #edit.print_metadata() # Print metadata of image to terminal
+    edit.temp_metadata_txt() # Translate metadata to txt !!NEEDED FOR BASICALLY ALL FUNCTIONS!!
+    #edit.temp_metadata_csv() # Translate metadata to cvs (Not needed tbh)
+   
+    adjust_metadata(edit, pref)
 
-    # initialize exif class tool
-    edit = ExifTool(img_dr, exif_tool_dr, data_dr)
-    # TODO: these calls should probably be moved into preferences based on what preferences they selected.
-    #edit.print_metadata()
-    edit.temp_metadata_txt()
-    edit.temp_metadata_csv()
-    edit.metadata_caption()
-
-    # Should delete all data except user preferences, should always be at the end
+    image_upload(output_file, location)
+     # ANNOTATION: Remove all information Should delete all data except user preferences, 
+     # should always be at the end
     edit.remove_metadata(meta_txt_dr)
     #edit.remove_metadata(meta_csv_dr)
-    image_deletion()
+
+
+'''
+This is the brains of this program. Based on the user's preferences, each category of metadata is
+adjusted. 
+
+'''
+def adjust_metadata(edit, pref):
+
+    data = pref.data
+    edits = pref.edits
+    gran = pref.gran
+    # If someone has selected ALL, go through all categories
+    if DataType.ALL in pref.data:
+        data = [DataType.list()]
+        data = data[1:] # remove ALL
+        edits = [edits[0] * 4] # make all prefs the same for all
+        gran = [gran[0] * 4]
+    
+    # For each type of data, go through and perform the appropriate edit action
+    for i in len(data):
+        match edits[i]:
+            case EditType.KEEP: 
+                continue
+            case EditType.DELETE:
+                edit.delete(data[i])
+            case EditType.CAPTION:
+                edit.addToCaption(data[i])
+            # Obscuring Data
+            case EditType.RANDOM_PERIOD, EditType.RANDOM_WINDOW, EditType.DEFAULT:
+                edit.obscure(data[i], edits[i], gran[i])
+    
+
+# Helper Methods for setup
+
+# Find the preferences that match the site, otherwise make a new one. Returns a UserPreferences
+def get_preferences(website, preferences):
+    for pref in preferences:
+        if pref.name == website:
+            return pref
+        # else: no prefernces founf
+    return set_new_prefernces(website)
+
+def set_new_prefernces(website): 
+    return
+
 
 if __name__ == "__main__":
     main()

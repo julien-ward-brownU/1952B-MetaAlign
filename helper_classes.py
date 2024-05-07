@@ -2,12 +2,11 @@ from enum import Enum
 
 # Shared classes to be used by preferences and edit
 
+# Grouping tags! 
 timeTags = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date"]
-
 locationTags = ["GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
                 "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 
                 "GPS Map Datum"]
-
 deviceTags = ["Make", "Camera Model Name", "Serial Number"]
 
 class DataType(Enum):
@@ -38,13 +37,15 @@ def image_detection(image):
     """
     Detects when image is uploaded onto website and stores image temp into placeholder value (input).
     input = detected_image
-    return input
+    return name of the website, file name of the image. 
     """
-    input = image
-    return input
+    # TORUN: change these!!! 
+    website = "instagram"
+    image_name = "test2.jpg"
+    return website, image_name
 
 # TODO: Pseudocode - Image Deletion after use 
-def image_deletion(image):
+def image_upload(image, website):
     """
     Detects when image is uploaded onto website and stores image temp into placeholder value (input).
     print("Deleting Image data file: ", input)
