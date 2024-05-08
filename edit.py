@@ -5,6 +5,7 @@ import pandas as pd
 from preferences import *
 from helper_classes import *
 import datetime
+import math
 
 '''
 ExifTool class manipulates meta data of an image by accessing the orginal ExifTool through the command line (https://exiftool.org/).
@@ -81,28 +82,6 @@ class ExifTool:
             case DataType.CAMERA_SETTINGS:
                 pass
     
-    def newTime(rand_type, gran, currentData):
-        oldTime = currentData.keys()[0]
-        start = 0
-        end = 0
-
-        
-        if end > datetime.NOW:
-            end = datetime.NOW
-
-        newTime = datetime.random(start, end)
-        return newTime
-
-    def newLoc(rand_type, gran, currentData):
-        return lat, lat_ref, long, long_ref, alt, alt_ref 
-
-
-    def newDevice(rand_type, gran, currentData):
-
-        return make, model, serial_num
-
-    
-
 
     '''
     Prints all available metadata of input file into terminal.
@@ -271,6 +250,98 @@ class ExifTool:
             print("All meta data sucessfully deleted.")
         else:
             print("Error deleting all meta data: ", result)
+
+    '''
+    Generates a new time on the image based on the granularity and type of randomness selected.
+    '''
+    def newTime(rand_type, gran, currentData):
+        oldTime = datetime.strptime(currentData.keys()[0])
+        start = datetime.NOW
+        end = datetime.NOW
+        diff = datetime.NOW
+
+        match gran:
+            case Granularity.LOW:
+                pass
+            case Granularity.MEDIUM:
+                pass
+            case Granularity.HIGH:
+                pass
+
+
+        match rand_type:
+            case EditType.DEFAULT:
+                pass
+            case EditType.RANDOM_WINDOW:
+                pass
+            case EditType.RANDOM_PERIOD:
+                pass
+        
+
+        if end > datetime.NOW:
+            end = datetime.NOW
+
+        newTime = start + (math.random() * (end - start))
+        return str(newTime)
+
+    def newLoc(rand_type, gran, currentData):
+        oldTime = datetime.strptime(currentData.keys()[0])
+        start = datetime.NOW
+        end = datetime.NOW
+        diff = datetime.NOW
+
+        match gran:
+            case Granularity.LOW:
+                pass
+            case Granularity.MEDIUM:
+                pass
+            case Granularity.HIGH:
+                pass
+
+        match rand_type:
+            case EditType.DEFAULT:
+                pass
+            case EditType.RANDOM_WINDOW:
+                pass
+            case EditType.RANDOM_PERIOD:
+                pass
+        
+
+        if end > datetime.NOW:
+            end = datetime.NOW
+
+        newTime = start + (math.random() * (end - start))
+        return lat, lat_ref, long, long_ref, alt, alt_ref 
+
+
+    def newDevice(rand_type, gran, currentData):
+        oldTime = datetime.strptime(currentData.keys()[0])
+        start = datetime.NOW
+        end = datetime.NOW
+        diff = datetime.NOW
+
+        match gran:
+            case Granularity.LOW:
+                pass
+            case Granularity.MEDIUM:
+                pass
+            case Granularity.HIGH:
+                pass
+
+
+        match rand_type:
+            case EditType.DEFAULT:
+                pass
+            case EditType.RANDOM_WINDOW, EditType.RANDOM_PERIOD:
+                pass
+        
+
+        if end > datetime.NOW:
+            end = datetime.NOW
+
+        newTime = start + (math.random() * (end - start))
+        return make, model, serial_num
+
 
     '''
     Edit and change the values and granularity of GPS metadata.
