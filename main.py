@@ -10,7 +10,7 @@ def main():
     # Ideally, this is a database, but for now I have just made some examples for demonstration
     preferences: list[UserPreferences] = list()
     pref_one = UserPreferences("instagram", [DataType.TIME, DataType.LOCATION, DataType.CAMERA_TYPE],
-                               [EditType.DEFAULT, EditType.RANDOM_PERIOD, EditType.DELETE],
+                               [EditType.KEEP, EditType.CAPTION, EditType.DELETE],
                                 [Granularity.MEDIUM, Granularity.HIGH, Granularity.NOT_APPLICABLE], False)
     pref_two = UserPreferences("facebook", [DataType.TIME, DataType.LOCATION, DataType.CAMERA_TYPE],
                                [EditType.KEEP, EditType.CAPTION, EditType.RANDOM_WINDOW],
@@ -40,7 +40,7 @@ def main():
     # directory to remove csv file
     meta_csv_dr = os.getcwd() + r"\data\meta_data\temp.csv"
 
-    edit = ExifTool(img_file, exif_tool, data_dr, output_file, pref)
+    edit = ExifTool(img_file, exif_tool, data_dr, output_file)
     #edit.print_metadata() # Print metadata of image to terminal
     edit.temp_metadata_txt() # Translate metadata to txt !!NEEDED FOR BASICALLY ALL FUNCTIONS!!
     #edit.temp_metadata_csv() # Translate metadata to cvs (Not needed tbh)
@@ -48,10 +48,10 @@ def main():
     adjust_metadata(edit, pref)
 
     image_upload(output_file, location)
-     # ANNOTATION: Remove all information Should delete all data except user preferences, 
+     # ANNOTATION: This call is especially important because it removes any temporary metadata that has been stored to be used for manipulation. This deletes those files.
      # should always be at the end
-    edit.remove_metadata(meta_txt_dr)
-    #edit.remove_metadata(meta_csv_dr)
+    #edit.remove_metadata(meta_txt_dr)
+    # edit.remove_metadata(meta_csv_dr)
 
 
 '''
@@ -63,7 +63,7 @@ def adjust_metadata(edit, pref):
 
     data = pref.data
     edits = pref.edits
-    gran = pref.gran
+    gran = pref.granularity
     # If someone has selected ALL, go through all categories
     if DataType.ALL in pref.data:
         data = [DataType.list()]
@@ -72,18 +72,20 @@ def adjust_metadata(edit, pref):
         gran = [gran[0] * 4]
     
     # For each type of data, go through and perform the appropriate edit action
-    for i in len(data):
-        match edits[i]:
+    for i in range(len(data)):
+        match (edits[i]):
             case EditType.KEEP: 
                 continue
             case EditType.DELETE:
                 edit.delete(data[i])
             case EditType.CAPTION:
-                edit.addToCaption(data[i])
+                edit.caption(data[i])
             # Obscuring Data
             case EditType.RANDOM_PERIOD, EditType.RANDOM_WINDOW, EditType.DEFAULT:
                 edit.obscure(data[i], edits[i], gran[i])
-    
+            case _:
+                print("Error in match and case")
+                
 
 # Helper Methods for setup
 
@@ -95,8 +97,31 @@ def get_preferences(website, preferences):
         # else: no prefernces founf
     return set_new_prefernces(website)
 
+# see create_new_preferences in the preferences class for what this would look like, would be the 
+# input from some UI that we did not get functional. 
 def set_new_prefernces(website): 
     return
+
+# TODO: Pseudocode - Image Upload Detection 
+def image_detection():
+    """
+    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
+    input = detected_image
+    return name of the website, file name of the image. 
+    """
+    # TORUN: change these!!! 
+    website = "instagram"
+    image_name = "test_image.jpg"
+    return website, image_name
+
+# TODO: Pseudocode - Image Deletion after use 
+def image_upload(image, website):
+    """
+    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
+    print("Deleting Image data file: ", input)
+    os.remove(image)
+    """
+    pass
 
 
 if __name__ == "__main__":

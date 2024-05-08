@@ -2,13 +2,6 @@ from enum import Enum
 
 # Shared classes to be used by preferences and edit
 
-# Grouping tags! 
-timeTags = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date"]
-locationTags = ["GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
-                "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 
-                "GPS Map Datum"]
-deviceTags = ["Make", "Camera Model Name", "Serial Number"]
-
 class DataType(Enum):
     ALL = 0
     TIME = 1
@@ -32,24 +25,33 @@ class Granularity(Enum):
     HIGH = 3
 
 
-# TODO: Pseudocode - Image Upload Detection 
-def image_detection(image):
-    """
-    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
-    input = detected_image
-    return name of the website, file name of the image. 
-    """
-    # TORUN: change these!!! 
-    website = "instagram"
-    image_name = "test2.jpg"
-    return website, image_name
+def exif_tags(type: DataType):
+    tags = []
+    text = []
+    match type:
+        case DataType.TIME:
+            tags = [f"-AllDates=", f"-GPSTimeStamp=", f"-GPSDateStamp="]
+            text = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date"]
+        case DataType.LOCATION: 
+            tags = [ "-gps:all="]
+            text = ["GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
+                "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 
+                "GPS Map Datum"]
+        case DataType.CAMERA_TYPE:
+            tags = [f"-Make=", f"-model=",  f"-SerialNumber="]
+            text = ["Make", "Camera Model Name", "Serial Number"]
+        case DataType.CAMERA_SETTINGS:
+            tags = [ "-all="]
+            # easier to change this to whats not in the other ones
+            text = ["Date/Time Original", "Create Date", "GPS Date/Time", "GPS Date Stamp", "Modify Date", "GPS Position", "GPS Latitude", "GPS Longitude", "GPS Altitude Ref",
+                "GPS Longitude Ref", "GPS Altitude Ref", "GPS Satellites", "GPS Img Direction Ref" 
+                "GPS Map Datum", "Make", "Camera Model Name", "Serial Number" ]
 
-# TODO: Pseudocode - Image Deletion after use 
-def image_upload(image, website):
-    """
-    Detects when image is uploaded onto website and stores image temp into placeholder value (input).
-    print("Deleting Image data file: ", input)
-    os.remove(image)
-    """
-    pass
+    return tags, text
+
+# Grouping tags! 
+
+
+
+
     
